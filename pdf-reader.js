@@ -6,7 +6,7 @@ const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const csv = require('csv-parser');
 const archiver = require('archiver');
 const { exec } = require('child_process');
-
+const puppeteer = require('puppeteer');
 const app = express();
 const PORT = 3000;
 
@@ -48,42 +48,39 @@ async function gerarPDFIndividual(templateBytes, dados) {
 }
 
 /* ---- 3. GERAR TABELA PDF ---- */
-async function gerarTabelaPDF(dados) {
-    const pdfDoc = await PDFDocument.create();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontSize = 10;
-    const margin = 40;
-    const pageHeight = 1000;
-    const pageWidth = 800;
-
-    let page = pdfDoc.addPage([pageWidth, pageHeight]);
-    let y = pageHeight - 50;
-
+// Gera um PDF a partir de HTML
+async function gerarTabelaPDF_HTML(dados) {
     const headers = Object.keys(dados[0]);
+    const rows = dados.map(row =>
+        `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`
+    ).join('');
 
-    // Cabeçalho
-    page.drawText(headers.join(' | '), {
-        x: margin,
-        y,
-        size: fontSize + 2,
-        font,
-        color: rgb(0, 0, 0),
-    });
-    y -= 20;
+    const html = `
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; font-size: 12px; }
+            table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 9px;}
+            th, td { border: 1px solid #333; padding: 5px; word-wrap: break-word; }
+            thead { display: table-header-group; }
+        </style>
+    </head>
+    <body>
+        <h2>Relatório de Equipamentos</h2>
+        <table>
+            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </body>
+    </html>`;
 
-    for (const row of dados) {
-        const line = headers.map(h => (row[h] || '').toString()).join(' | ');
-        page.drawText(line, { x: margin, y, size: fontSize, font, color: rgb(0, 0, 0) });
-        y -= 15;
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
 
-        // Nova página se faltar espaço
-        if (y < 50) {
-            page = pdfDoc.addPage([pageWidth, pageHeight]);
-            y = pageHeight - 50;
-        }
-    }
-
-    return await pdfDoc.save();
+    const pdfBuffer = await page.pdf({ format: 'A4', landscape: true, printBackground: true, preferCSSPageSize: true });
+    await browser.close();
+    return pdfBuffer;
 }
 
 /* ---- 4. CRIAR ZIP ---- */
@@ -119,7 +116,7 @@ async function handleUpload(caminhoCSV) {
         pdfs.push(pdf);
     }
 
-    const tabelaPDF = await gerarTabelaPDF(dados);
+    const tabelaPDF = await gerarTabelaPDF_HTML(dados);
     return await criarZip(pdfs, tabelaPDF);
 }
 
