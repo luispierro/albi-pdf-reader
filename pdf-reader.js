@@ -10,8 +10,8 @@ const { exec } = require('child_process');
 const app = express();
 const PORT = 3000;
 
-const TEMPLATE = path.join(__dirname, 'PDFMODEL-ALBI.pdf');
-const templateBytes = fs.readFileSync(TEMPLATE);
+const TEMPLATE_PATH = path.join(__dirname, 'PDFMODEL-ALBI.pdf');
+const templateBytes = fs.readFileSync(TEMPLATE_PATH);
 
 app.use(express.static('public'));
 const upload = multer({ dest: 'uploads/' });
@@ -47,76 +47,56 @@ async function gerarPDFIndividual(templateBytes, dados) {
     return await pdfDoc.save();
 }
 
-// Função para preencher PDF (retorna o Buffer)
-async function preencherPdf(dados) {
-    const templateBytes = fs.readFileSync(TEMPLATE);
-    const pdfDoc = await PDFDocument.load(templateBytes);
-    const form = pdfDoc.getForm();
+/* ---- 4. CRIAR ZIP ---- */
+function criarZip(pdfs, tabelaPDF) {
+    return new Promise((resolve, reject) => {
+        const zipName = `pdfs_${Date.now()}.zip`;
+        const zipPath = path.join(__dirname, zipName);
+        const output = fs.createWriteStream(zipPath);
+        const archive = archiver('zip', { zlib: { level: 9 } });
 
-    for (const [key, value] of Object.entries(dados)) {
-        try {
-            const field = form.getTextField(key);
-            field.setText(value);
-        } catch (e) {
-            console.warn(`Campo não encontrado: ${key}`);
-        }
-    }
+        output.on('close', () => resolve(zipPath));
+        archive.on('error', reject);
 
-    form.flatten();
-    const pdfBytes = await pdfDoc.save().catch(e => { 
-        console.error("Erro ao salvar PDF:", e); 
-        return null;
+        archive.pipe(output);
+
+        pdfs.forEach((pdf, i) => {
+            archive.append(Buffer.from(pdf), { name: `documento_${i + 1}.pdf` });
+        });
+
+        
+        archive.finalize();
     });
-    if (!pdfBytes) throw new Error("Falha ao salvar PDF");
-    return Buffer.from(pdfBytes);
 }
 
-// Endpoint para upload e geração do ZIP
+/* ---- 5. FLUXO COMPLETO ---- */
+async function handleUpload(caminhoCSV) {
+    const templateBytes = fs.readFileSync(TEMPLATE_PATH);
+    const dados = await lerCSV(caminhoCSV);
+
+    const pdfs = [];
+    for (const row of dados) {
+        const pdf = await gerarPDFIndividual(templateBytes, row);
+        pdfs.push(pdf);
+    }
+
+    
+    return await criarZip(pdfs);
+}
+
+/* ---- ROTA PRINCIPAL ---- */
 app.post('/upload', upload.single('csvfile'), async (req, res) => {
-    const filePath = req.file.path;
-    const linhas = [];
-
-    fs.createReadStream(filePath)
-        .pipe(csv({ separator: ';' }))
-        .on('data', (row) => {
-            const cleaned = {};
-            for (const [key, value] of Object.entries(row)) {
-                cleaned[key.trim()] = value ? value.trim() : '';
-            }
-            linhas.push(cleaned);
-        })
-        .on('end', async () => {
-            fs.unlinkSync(filePath); // remove o CSV temporário
-
-            // Nome do arquivo final
-            const zipName = `pdfs_${Date.now()}.zip`;
-            const zipPath = path.join(__dirname, zipName);
-
-            const output = fs.createWriteStream(zipPath);
-            const archive = archiver('zip', { zlib: { level: 9 } });
-
-            output.on('close', () => {
-                res.download(zipPath, zipName, () => {
-                    fs.unlinkSync(zipPath); // limpa o zip após download
-                });
-            });
-
-            archive.pipe(output);
-
-            // Para cada linha do CSV, gerar um PDF e adicionar ao ZIP
-            for (let i = 0; i < linhas.length; i++) {
-                const pdfBytes = await preencherPdf(linhas[i]);
-                if (!pdfBytes || !Buffer.isBuffer(pdfBytes)) {
-                    throw new Error(`Erro: PDF inválido para a linha ${i + 1}`);
-                }
-                const nomeArquivo = (linhas[i].Nome || `saida_${i + 1}`).replace(/[^\w\-]/g, '_');
-                archive.append(pdfBytes, { name: `${nomeArquivo}.pdf` });
-            }
-
-            archive.finalize();
+    try {
+        const zipPath = await handleUpload(req.file.path);
+        res.download(zipPath, path.basename(zipPath), () => {
+            fs.unlinkSync(zipPath);
+            fs.unlinkSync(req.file.path);
         });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao processar arquivo.');
+    }
 });
-
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
