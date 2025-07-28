@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerar PDFs</title>
+</head>
+<body>
+  <h1>Upload de CSV para Gerar PDFs</h1>
+  <form id="uploadForm">
+    <input type="file" name="csvfile" accept=".csv" required>
+    <button type="submit">Enviar</button>
+  </form>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const resp = await fetch('/upload', { method: 'POST', body: formData });
+      if (!resp.ok) { alert("Erro ao gerar PDFs"); return; }
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pdfs_gerados.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
