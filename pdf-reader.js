@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const { PDFDocument } = require('pdf-lib');
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const csv = require('csv-parser');
 const archiver = require('archiver');
 const { exec } = require('child_process');
@@ -47,6 +47,45 @@ async function gerarPDFIndividual(templateBytes, dados) {
     return await pdfDoc.save();
 }
 
+/* ---- 3. GERAR TABELA PDF ---- */
+async function gerarTabelaPDF(dados) {
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontSize = 10;
+    const margin = 40;
+    const pageHeight = 1000;
+    const pageWidth = 800;
+
+    let page = pdfDoc.addPage([pageWidth, pageHeight]);
+    let y = pageHeight - 50;
+
+    const headers = Object.keys(dados[0]);
+
+    // Cabeçalho
+    page.drawText(headers.join(' | '), {
+        x: margin,
+        y,
+        size: fontSize + 2,
+        font,
+        color: rgb(0, 0, 0),
+    });
+    y -= 20;
+
+    for (const row of dados) {
+        const line = headers.map(h => (row[h] || '').toString()).join(' | ');
+        page.drawText(line, { x: margin, y, size: fontSize, font, color: rgb(0, 0, 0) });
+        y -= 15;
+
+        // Nova página se faltar espaço
+        if (y < 50) {
+            page = pdfDoc.addPage([pageWidth, pageHeight]);
+            y = pageHeight - 50;
+        }
+    }
+
+    return await pdfDoc.save();
+}
+
 /* ---- 4. CRIAR ZIP ---- */
 function criarZip(pdfs, tabelaPDF) {
     return new Promise((resolve, reject) => {
@@ -64,7 +103,7 @@ function criarZip(pdfs, tabelaPDF) {
             archive.append(Buffer.from(pdf), { name: `documento_${i + 1}.pdf` });
         });
 
-        
+        archive.append(Buffer.from(tabelaPDF), { name: 'tabela_completa.pdf' });
         archive.finalize();
     });
 }
@@ -80,8 +119,8 @@ async function handleUpload(caminhoCSV) {
         pdfs.push(pdf);
     }
 
-    
-    return await criarZip(pdfs);
+    const tabelaPDF = await gerarTabelaPDF(dados);
+    return await criarZip(pdfs, tabelaPDF);
 }
 
 /* ---- ROTA PRINCIPAL ---- */
