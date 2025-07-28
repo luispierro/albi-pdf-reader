@@ -16,6 +16,37 @@ const templateBytes = fs.readFileSync(TEMPLATE);
 app.use(express.static('public'));
 const upload = multer({ dest: 'uploads/' });
 
+/* ---- 1. LER CSV ---- */
+function lerCSV(caminhoCSV) {
+    return new Promise((resolve, reject) => {
+        const results = [];
+        fs.createReadStream(caminhoCSV)
+            .pipe(csv({ separator: ';' }))
+            .on('data', (data) => results.push(data))
+            .on('end', () => resolve(results))
+            .on('error', reject);
+    });
+}
+
+/* ---- 2. GERAR PDF INDIVIDUAL ---- */
+async function gerarPDFIndividual(templateBytes, dados) {
+    const pdfDoc = await PDFDocument.load(templateBytes);
+    const form = pdfDoc.getForm();
+
+    for (const [key, value] of Object.entries(dados)) {
+        const fieldName = key.trim();
+        try {
+            const field = form.getTextField(fieldName);
+            field.setText((value || '').toString());
+        } catch {
+            console.warn(`Campo "${fieldName}" não encontrado no PDF.`);
+        }
+    }
+
+    form.flatten();
+    return await pdfDoc.save();
+}
+
 // Função para preencher PDF (retorna o Buffer)
 async function preencherPdf(dados) {
     const templateBytes = fs.readFileSync(TEMPLATE);
