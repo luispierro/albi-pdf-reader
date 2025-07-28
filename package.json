@@ -1,10 +1,10 @@
 {
   "name": "albi-pdf-reader",
   "version": "1.0.0",
-  "description": "",
-  "main": "pdf-reader.js",
+  "description": "App para preencher PDFs com dados de CSV",
+  "bin": "pdf-reader.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node pdf-reader.js"
   },
   "keywords": [],
   "author": "",
@@ -13,8 +13,13 @@
     "archiver": "^7.0.1",
     "csv-parser": "^3.2.0",
     "express": "^5.1.0",
-    "fs": "^0.0.1-security",
     "multer": "^2.0.2",
     "pdf-lib": "^1.17.1"
+  },
+  "pkg": {
+    "assets": [
+      "PDFMODEL-ALBI.pdf",
+      "public/**/*"
+    ]
   }
 }

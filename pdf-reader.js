@@ -5,11 +5,13 @@ const path = require('path');
 const { PDFDocument } = require('pdf-lib');
 const csv = require('csv-parser');
 const archiver = require('archiver');
+const { exec } = require('child_process');
 
 const app = express();
 const PORT = 3000;
 
-const TEMPLATE = 'PDFMODEL-ALBI.pdf';
+const TEMPLATE = path.join(__dirname, 'PDFMODEL-ALBI.pdf');
+const templateBytes = fs.readFileSync(TEMPLATE);
 
 app.use(express.static('public'));
 const upload = multer({ dest: 'uploads/' });
@@ -84,4 +86,8 @@ app.post('/upload', upload.single('csvfile'), async (req, res) => {
         });
 });
 
-app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+
+app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    exec(`start http://localhost:${PORT}`);
+});
