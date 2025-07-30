@@ -60,7 +60,7 @@ async function gerarTabelaPDF_HTML(dados) {
     <head>
         <style>
             body { font-family: Arial, sans-serif; font-size: 12px; }
-            table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 9px;}
+            table { border-collapse: collapse; width: 80%; table-layout: fixed; font-size: 12px;}
             th, td { border: 1px solid #333; padding: 5px; word-wrap: break-word; }
             thead { display: table-header-group; }
         </style>
