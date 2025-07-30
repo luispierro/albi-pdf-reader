@@ -1,7 +1,7 @@
 {
   "name": "albi-pdf-reader",
   "version": "1.0.0",
-  "description": "App para preencher PDFs com dados de CSV",
+  "description": "Web App to convert CSV into PDF",
   "bin": "pdf-reader.js",
   "scripts": {
     "start": "node pdf-reader.js"
