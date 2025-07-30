@@ -1,7 +1,5 @@
 # **PDF & ZIP Report Generator**  
-_A simple web tool to generate multiple PDFs from a CSV and bundle them into a ZIP._  
-
-![Node.js](https://img.shields.io/badge/Node.js-18+-green) ![Express](https://img.shields.io/badge/Express-5.x-blue) ![pdf-lib](https://img.shields.io/badge/PDF--Lib-1.17+-orange) ![puppeteer](https://img.shields.io/badge/Puppeteer-latest-lightgrey)  
+_A simple web tool to generate multiple PDFs from a CSV and bundle them into a ZIP._
 
 ---
 
@@ -15,7 +13,7 @@ _A simple web tool to generate multiple PDFs from a CSV and bundle them into a Z
 ---
 
 ## **Requirements**
-- [Node.js](https://nodejs.org/) **v18+**  
+- Node.js **v18+**  
 - npm (comes with Node.js)  
 - Chrome/Edge for advanced save dialog support  
 
