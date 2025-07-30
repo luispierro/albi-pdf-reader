@@ -24,13 +24,13 @@ _A simple web tool to generate multiple PDFs from a CSV and bundle them into a Z
 ## **Installation**
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/pdf-zip-generator.git
-   cd pdf-zip-generator
+   git clone https://github.com/luispierro/albi-pdf-reader.git
+   cd albi-pdf-reader
    ```
 
 2. **Install dependencies**
    ```bash
-   npm install
+   npm install express multer csv-parser archiver pdf-lib puppeteer
    ```
 
 ---
@@ -56,24 +56,21 @@ You can package the application into a single `.exe` file using [pkg](https://gi
    ```json
    "pkg": {
      "assets": [
-       "public/templates/**/*",
-       "node_modules/puppeteer/.local-chromium/**/*"
+       "public/**/*"
      ]
    },
    "scripts": {
-     "start": "node pdf-reader.js",
-     "build": "pkg pdf-reader.js --targets node18-win-x64"
+     "start": "node pdf-reader.js"
    }
    ```
 
 3. **Build the executable:**
    ```bash
-   npm run build
+   pkg . --targets node18-win-x64 --output CSV2PDF.exe
    ```
 
 - The resulting `.exe` runs on **Windows 10 and newer (64‑bit)**.  
-- Node.js is **not required** on the target machine — the runtime is bundled.  
-- Ensure Puppeteer’s Chromium is included (via the `pkg.assets` configuration above).  
+- Node.js is **not required** on the target machine — the runtime is bundled.    
 
 ---
 
@@ -83,22 +80,10 @@ You can package the application into a single `.exe` file using [pkg](https://gi
 3. Wait while PDFs and the consolidated report are generated.  
 4. Save the `.zip` file containing:  
    - Individual PDFs (`equipment_<last_column_value>.pdf`)  
-   - The full report (`full_report.pdf`).  
+   - The full report (`full_report.pdf`).   
 
 ---
 
-## **Built With**
-- **[Express](https://expressjs.com/)** – Web server framework.  
-- **[Multer](https://github.com/expressjs/multer)** – File upload handling.  
-- **[pdf-lib](https://pdf-lib.js.org/)** – PDF manipulation.  
-- **[puppeteer](https://pptr.dev/)** – HTML-to-PDF rendering.  
-- **[csv-parser](https://github.com/mafintosh/csv-parser)** – CSV parsing.  
-- **[archiver](https://github.com/archiverjs/node-archiver)** – ZIP creation.  
-
----
-
-## **Troubleshooting**
-- **Puppeteer not launching inside `.exe`:**  
-  Make sure you included the `.local-chromium` folder in `pkg.assets`.  
+## **Troubleshooting**  
 - **Windows SmartScreen warning:**  
   On first run, Windows may block unknown executables. Select **More info → Run anyway**.  
