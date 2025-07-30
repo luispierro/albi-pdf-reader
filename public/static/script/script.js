@@ -36,11 +36,24 @@ async function sendCSV(form) {
     }
 }
 
-function downloadFile(blob, fileName) {
-    const url = URL.createObjectURL(blob);
+async function downloadFile(blob, fileName) {
+    /*const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = fileName;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);*/
+
+    const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{
+            description: 'Arquivo ZIP',
+            accept: { 'application/zip': ['.zip'] },
+        }],
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
 }
