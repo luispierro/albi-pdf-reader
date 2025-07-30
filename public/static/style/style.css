@@ -1,3 +1,10 @@
+body {
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background: #f8f9fb;
+    color: #333;
+    height: 100vh;
+    margin: 0;
+}
 footer{
     background-color: #4e4e4e;
     position: fixed;
@@ -16,5 +23,23 @@ footer p{
     font-size: 14px;
 }
 .container{
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     padding-bottom: 5rem; /* Space available between last element and footer */
+}
+button {
+    background: #4f46e5; /* azul/violeta moderno */
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: 100%;
+}
+button:hover {
+    background: #4338ca;
 }
