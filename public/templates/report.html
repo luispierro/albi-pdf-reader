@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 10px; 
+            margin: 40px; 
+            text-align: center;
+        }
+        h2 { margin-bottom: 5px; }
+        .data { margin-bottom: 20px; font-size: 9px; color: #555; }
+        .tabela-container {
+            display: flex;
+            justify-content: center;   /* centraliza horizontalmente */
+            width: 100%;
+        }
+        table { 
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #333; 
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            width: 1000px; /* tamanho natural */
+            transform: scale(0.8);               /* reduz para caber */
+            transform-origin: top center;        /* centraliza após redução */
+        }
+        th, td { 
+            border: 1px solid #ccc; 
+            padding: 8px 12px; 
+            word-wrap: break-word; 
+        }
+        th { 
+            background: #2c3e50;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+        }
+        thead { display: table-header-group; }
+        tr:nth-child(even) td { background: #f8f8f8; }
+    </style>
+</head>
+<body>
+    <h2>Relatório de Equipamentos</h2>
+    <div class="data">{{data}}</div>
+    <div class="tabela-container">
+        <table>
+            <thead>
+                <tr>{{thead}}</tr>
+            </thead>
+            <tbody>
+                {{tbody}}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

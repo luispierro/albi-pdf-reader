@@ -50,35 +50,29 @@ async function gerarPDFIndividual(templateBytes, dados) {
 /* ---- 3. GERAR TABELA PDF ---- */
 // Gera um PDF a partir de HTML
 async function gerarTabelaPDF_HTML(dados) {
-    const headers = Object.keys(dados[0]);
-    const rows = dados.map(row =>
-        `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`
-    ).join('');
+    const templatePath = path.join(__dirname, 'public/templates/report.html');
+    let html = fs.readFileSync(templatePath, 'utf8');
 
-    const html = `
-    <html>
-    <head>
-        <style>
-            body { font-family: Arial, sans-serif; font-size: 12px; }
-            table { border-collapse: collapse; width: 80%; table-layout: fixed; font-size: 12px;}
-            th, td { border: 1px solid #333; padding: 5px; word-wrap: break-word; }
-            thead { display: table-header-group; }
-        </style>
-    </head>
-    <body>
-        <h2>Relatório de Equipamentos</h2>
-        <table>
-            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-            <tbody>${rows}</tbody>
-        </table>
-    </body>
-    </html>`;
+    const headers = Object.keys(dados[0]);
+    const thead = headers.map(h => `<th>${h}</th>`).join('');
+    const tbody = dados.map(row =>
+        `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`).join('');
+    const data = new Date().toLocaleString();
+
+    // Substituir placeholders
+    html = html.replace('{{thead}}', thead).replace('{{tbody}}', tbody).replace('{{data}}', data);
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
-    const pdfBuffer = await page.pdf({ format: 'A4', landscape: true, printBackground: true, preferCSSPageSize: true });
+    const pdfBuffer = await page.pdf({
+        format: 'A4',
+        landscape: true,
+        printBackground: true,
+        preferCSSPageSize: true
+    });
+
     await browser.close();
     return pdfBuffer;
 }
