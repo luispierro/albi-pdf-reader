@@ -7,7 +7,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     const file = fileInput.files[0];
     
     if (!file || !file.name.toLowerCase().endsWith('.csv')) {
-        alert('Por favor, selecione um arquivo CSV válido.');
+        alert('Please, choose one valid CSV file.');
         return;
     }
     await sendCSV(e.target);
