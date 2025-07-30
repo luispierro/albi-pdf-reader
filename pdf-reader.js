@@ -13,7 +13,7 @@ const app = express();
 //default port to be used
 const PORT = 3000;
 
-const TEMPLATE_PATH = path.join(__dirname, 'public/templates/PDFMODEL-ALBI.pdf');
+const TEMPLATE_PATH = path.join(__dirname, 'public/templates/PDFMODEL-ALBI v2.pdf');
 
 //directory to where the html will be placed
 app.use(express.static('public'));

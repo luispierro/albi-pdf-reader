@@ -11,9 +11,9 @@
         }
         h2 { margin-bottom: 5px; }
         .data { margin-bottom: 20px; font-size: 9px; color: #555; }
-        .tabela-container {
+        .table-container {
             display: flex;
-            justify-content: center;   /* centraliza horizontalmente */
+            justify-content: center;   
             width: 100%;
         }
         table { 
@@ -23,9 +23,9 @@
             border-radius: 8px;
             overflow: hidden;
             background: #fff;
-            width: 1000px; /* tamanho natural */
-            transform: scale(0.8);               /* reduz para caber */
-            transform-origin: top center;        /* centraliza após redução */
+            width: 1000px; 
+            transform: scale(0.8);               
+            transform-origin: top center;        
         }
         th, td { 
             border: 1px solid #ccc; 
@@ -44,9 +44,9 @@
     </style>
 </head>
 <body>
-    <h2>Relatório de Equipamentos</h2>
+    <h2>Equipment Report</h2>
     <div class="data">{{data}}</div>
-    <div class="tabela-container">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>{{thead}}</tr>
