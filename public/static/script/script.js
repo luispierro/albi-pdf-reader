@@ -37,15 +37,8 @@ async function sendCSV(form) {
 }
 
 async function downloadFile(blob, fileName) {
-    /*const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);*/
-
+    
+    //File System Access API that works only on Chrome and Edge
     const handle = await window.showSaveFilePicker({
         suggestedName: fileName,
         types: [{
