@@ -20,7 +20,7 @@ app.use(express.static('public'));
 
 const upload = multer({ dest: 'uploads/' });
 
-/* ---- 1. reads CSV ---- */
+/* ---- reads CSV ---- */
 function readCSV(pathCSV) {
     return new Promise((resolve, reject) => {
         const results = [];
@@ -32,7 +32,7 @@ function readCSV(pathCSV) {
     });
 }
 
-/* ---- 2. Fill each PDF ---- */
+/* ---- Fill each PDF ---- */
 async function fillEachPDF(templateBytes, values) {
     const pdfDoc = await PDFDocument.load(templateBytes);
     const form = pdfDoc.getForm();
@@ -51,7 +51,7 @@ async function fillEachPDF(templateBytes, values) {
     return await pdfDoc.save();
 }
 
-/* ---- 3. Creates the table to exported as PDF ---- */
+/* ---- Creates the table to exported as PDF ---- */
 // It will be created thru HTML
 async function createTablePDF_HTML(values) {
     //path where the default table can be find
@@ -86,7 +86,7 @@ async function createTablePDF_HTML(values) {
     return pdfBuffer;
 }
 
-/* ---- 4. Creates the ZIP file to be downloaded ---- */
+/* ---- Creates the ZIP file to be downloaded ---- */
 function createZip(pdfs, tablePDF, fileNames) {
     return new Promise((resolve, reject) => {
         const zipName = `pdfs_${Date.now()}.zip`;
@@ -99,10 +99,11 @@ function createZip(pdfs, tablePDF, fileNames) {
 
         archive.pipe(output);
 
+        //puts each pdf inside the archive and renames it to the column of zeit
         pdfs.forEach((pdf, i) => {
             archive.append(Buffer.from(pdf), { name: `equipment_${fileNames[i]}.pdf` });
         });
-
+        //add the full report to it also
         archive.append(Buffer.from(tablePDF), { name: 'full_report.pdf' });
         archive.finalize();
     });
@@ -110,9 +111,11 @@ function createZip(pdfs, tablePDF, fileNames) {
 
 app.post('/upload', upload.single('csvfile'), async (req, res) => {
     try {
+        //with the received csv calls the reader and adds also the templates path
         const templateBytes = fs.readFileSync(TEMPLATE_PATH);
         const data = await readCSV(req.file.path);
 
+        //for each row on the csv, calls to create and fill each pdf with the data extracted and also creates the name to the final pdf.
         const pdfs = [];
         const fileNames = [];
         for (const row of data) {
@@ -124,9 +127,12 @@ app.post('/upload', upload.single('csvfile'), async (req, res) => {
             fileNames.push(name);
         }
 
+        //creates the final full report
         const tablePDF = await createTablePDF_HTML(data);
+        //zip everything
         const zipPath = await createZip(pdfs, tablePDF, fileNames);
 
+        //send the zipfile to download
         res.download(zipPath, path.basename(zipPath), () => {
             fs.unlinkSync(zipPath);
             fs.unlinkSync(req.file.path);
