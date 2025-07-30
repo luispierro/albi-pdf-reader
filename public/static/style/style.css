@@ -1,0 +1,20 @@
+footer{
+    background-color: #4e4e4e;
+    position: fixed;
+    padding: 10px 0px;
+    text-align: center;
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: clamp(1rem, 1vw, 3rem);
+    width: 100%;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+footer p{ 
+    display: inline;
+    font-size: 14px;
+}
+.container{
+    padding-bottom: 5rem; /* Space available between last element and footer */
+}
