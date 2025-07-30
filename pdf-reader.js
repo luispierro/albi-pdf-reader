@@ -87,7 +87,7 @@ async function createTablePDF_HTML(values) {
 }
 
 /* ---- 4. Creates the ZIP file to be downloaded ---- */
-function createZip(pdfs, tablePDF) {
+function createZip(pdfs, tablePDF, fileNames) {
     return new Promise((resolve, reject) => {
         const zipName = `pdfs_${Date.now()}.zip`;
         const zipPath = path.join(__dirname, zipName);
@@ -100,7 +100,7 @@ function createZip(pdfs, tablePDF) {
         archive.pipe(output);
 
         pdfs.forEach((pdf, i) => {
-            archive.append(Buffer.from(pdf), { name: `document_${i + 1}.pdf` });
+            archive.append(Buffer.from(pdf), { name: `equipment_${fileNames[i]}.pdf` });
         });
 
         archive.append(Buffer.from(tablePDF), { name: 'full_report.pdf' });
@@ -114,13 +114,18 @@ app.post('/upload', upload.single('csvfile'), async (req, res) => {
         const data = await readCSV(req.file.path);
 
         const pdfs = [];
+        const fileNames = [];
         for (const row of data) {
             const pdf = await fillEachPDF(templateBytes, row);
             pdfs.push(pdf);
+
+            const lastColumn = Object.keys(row).pop();
+            const name = (row[lastColumn] || `document_${i + 1}`).toString().replace(/[\\/:*?"<>|]/g, '_');
+            fileNames.push(name);
         }
 
         const tablePDF = await createTablePDF_HTML(data);
-        const zipPath = await createZip(pdfs, tablePDF);
+        const zipPath = await createZip(pdfs, tablePDF, fileNames);
 
         res.download(zipPath, path.basename(zipPath), () => {
             fs.unlinkSync(zipPath);
