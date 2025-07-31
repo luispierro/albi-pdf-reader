@@ -11,7 +11,7 @@ const puppeteer = require('puppeteer');
 const app = express();
 
 //default port to be used
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const TEMPLATE_PATH = path.join(__dirname, 'public/templates/PDFMODEL-ALBI v2.pdf');
 
