@@ -20,7 +20,7 @@ app.use(express.static('public'));
 
 const upload = multer({ dest: 'uploads/' });
 
-/* ---- reads CSV ---- */
+/* ---- reads CSV ----- */
 function readCSV(pathCSV) {
     return new Promise((resolve, reject) => {
         const results = [];
