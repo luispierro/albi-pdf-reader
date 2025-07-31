@@ -69,7 +69,7 @@ async function createTablePDF_HTML(values) {
     //changes the places holders on the template
     html = html.replace('{{thead}}', thead).replace('{{tbody}}', tbody).replace('{{data}}', data);
     
-    //launches the table now filled
+    //launches the table now fille d
     const browser = await puppeteer.launch({
         executablePath: '/app/.apt/usr/bin/google-chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox']
