@@ -71,7 +71,7 @@ async function createTablePDF_HTML(values) {
     
     //launches the table now fille d
     const browser = await puppeteer.launch({
-        executablePath: '/app/.apt/usr/bin/google-chrome',
+        //executablePath: '/app/.apt/usr/bin/google-chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
