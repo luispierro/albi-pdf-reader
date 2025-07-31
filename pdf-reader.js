@@ -15,8 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 async function launchBrowser() {
     const executablePath = process.env.GOOGLE_CHROME_FOR_TESTING_BIN 
-        || process.env.CHROME_BIN 
-        || '/usr/bin/google-chrome';
+        || '/app/.apt/opt/google/chrome-for-testing/chrome';
 
     return await puppeteer.launch({
         executablePath,
