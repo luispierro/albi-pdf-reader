@@ -13,6 +13,17 @@ const app = express();
 //default port to be used
 const PORT = process.env.PORT || 3000;
 
+async function launchBrowser() {
+    const executablePath = process.env.GOOGLE_CHROME_FOR_TESTING_BIN 
+        || process.env.CHROME_BIN 
+        || '/usr/bin/google-chrome';
+
+    return await puppeteer.launch({
+        executablePath,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+}
+
 const TEMPLATE_PATH = path.join(__dirname, 'public/templates/PDFMODEL-ALBI v2.pdf');
 
 //directory to where the html will be placed
@@ -70,10 +81,11 @@ async function createTablePDF_HTML(values) {
     html = html.replace('{{thead}}', thead).replace('{{tbody}}', tbody).replace('{{data}}', data);
     
     //launches the table now fille d
-    const browser = await puppeteer.launch({
+    const browser = await launchBrowser();
+    /*const browser = await puppeteer.launch({
         executablePath: process.env.GOOGLE_CHROME_FOR_TESTING_BIN || process.env.CHROME_PATH,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    });*/
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     
