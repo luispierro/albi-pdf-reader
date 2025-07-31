@@ -7,7 +7,6 @@
     "node": "18.x"
   },
   "scripts": {
-    "heroku-postbuild": "mkdir ./.cache && mv /app/.cache/puppeteer ./.cache",
     "start": "node pdf-reader.js"
   },
   "keywords": [],
