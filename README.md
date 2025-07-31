@@ -42,38 +42,8 @@ Then open in your browser:
 
 ---
 
-## **Build a Standalone Executable (Windows 10+)**
-You can package the application into a single `.exe` file using [pkg](https://github.com/vercel/pkg):  
-
-1. **Install pkg globally:**
-   ```bash
-   npm install -g pkg
-   ```
-
-2. **Add `pkg` configuration to `package.json`:**
-   ```json
-   "pkg": {
-     "assets": [
-       "public/**/*"
-     ]
-   },
-   "scripts": {
-     "start": "node pdf-reader.js"
-   }
-   ```
-
-3. **Build the executable:**
-   ```bash
-   pkg . --targets node18-win-x64 --output CSV2PDF.exe
-   ```
-
-- The resulting `.exe` runs on **Windows 10 and newer (64‑bit)**.  
-- Node.js is **not required** on the target machine — the runtime is bundled.    
-
----
-
 ## **Usage**
-1. Start the app (or run the `.exe`).  
+1. Start the app.  
 2. Select a `.csv` file and click **Upload**.  
 3. Wait while PDFs and the consolidated report are generated.  
 4. Save the `.zip` file containing:  
