@@ -70,7 +70,9 @@ async function createTablePDF_HTML(values) {
     html = html.replace('{{thead}}', thead).replace('{{tbody}}', tbody).replace('{{data}}', data);
     
     //launches the table now filled
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     
